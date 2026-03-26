@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MINDSMITH FRENCH PRO</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+<h1>🇫🇷 MINDSMITH FRENCH PRO</h1>
+</header>
+
+<div class="container">
+
+<!-- LOGIN -->
+<div class="card">
+<h2>Login</h2>
+<input id="username" placeholder="Username">
+<button onclick="login()">Login</button>
+<p id="welcome"></p>
+</div>
+
+<!-- XP -->
+<div class="card">
+<h3>⭐ XP SYSTEM</h3>
+<p id="xp">XP: 0</p>
+<p id="level">Level: 1</p>
+</div>
+
+<!-- LESSONS -->
+<div class="card">
+<h2>📚 Lessons</h2>
+<div id="lessonsContainer"></div>
+</div>
+
+<!-- QUIZ -->
+<div class="card">
+<h2>🧠 Quiz</h2>
+<p id="q"></p>
+<button id="a" onclick="answer('a')"></button>
+<button id="b" onclick="answer('b')"></button>
+<progress id="progressBar" value="0" max="100"></progress>
+<p id="score"></p>
+</div>
+
+<!-- PRACTICE -->
+<div class="card">
+<h2>✍️ Practice</h2>
+<input id="practiceInput" placeholder="Translate...">
+<button onclick="checkPractice()">Check</button>
+<p id="practiceResult"></p>
+</div>
+
+<!-- LISTENING -->
+<div class="card">
+<h2>🎧 Listening</h2>
+<audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
+<form data-answer="B">
+<label><input type="radio" name="q1" value="A"> Option A</label>
+<label><input type="radio" name="q1" value="B"> Option B</label>
+<label><input type="radio" name="q1" value="C"> Option C</label>
+<button type="button" onclick="checkAnswer(this)">Check</button>
+<p class="result"></p>
+</form>
+</div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
