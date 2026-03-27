@@ -1,199 +1,165 @@
-// LOGIN
+// ================= USER DATA =================
+let user = localStorage.getItem("user");
+let lessonIndex = parseInt(localStorage.getItem("lesson")) || 0;
+let xp = parseInt(localStorage.getItem("xp")) || 0;
+let level = parseInt(localStorage.getItem("level")) || 1;
+let coins = parseInt(localStorage.getItem("coins")) || 0;
+let money = parseFloat(localStorage.getItem("money")) || 0;
+
+// ================= LOGIN =================
 function login(){
-  let user = document.getElementById("username").value;
-  localStorage.setItem("user", user);
-  document.getElementById("welcome").innerText = "Welcome " + user;
+  let name = document.getElementById("username").value;
+  if(!name) return alert("Enter name");
+
+  user = name;
+  localStorage.setItem("user", name);
+
+  document.getElementById("welcome").innerText = "Welcome " + name;
+
+  loadLesson();
+  updateUI();
+  loadMissions();
 }
 
-// XP SYSTEM
-let xp = 0;
-let level = 1;
-
-function addXP(points){
-  xp += points;
-  if(xp >= 100){
-    level++;
-    xp = 0;
-    alert("🎉 Level Up!");
-  }
-  document.getElementById("xp").innerText = "XP: " + xp;
-  document.getElementById("level").innerText = "Level: " + level;
+// ================= UI =================
+function updateUI(){
+  xpEl("xp", "XP:"+xp);
+  xpEl("level", "Lv:"+level);
+  xpEl("coins", "🪙"+coins);
+  xpEl("money", "$"+money);
 }
 
-// =========================
-// 100 UNIQUE LESSON WORDS
-// =========================
+function xpEl(id,text){
+  document.getElementById(id).innerText = text;
+}
+
+// ================= LESSONS (100 UNIQUE) =================
 let lessons = [
-{word:"Bonjour", meaning:"Hello", sentence:"Bonjour, comment ça va ?"},
-{word:"Merci", meaning:"Thank you", sentence:"Merci pour ton aide."},
-{word:"Oui", meaning:"Yes", sentence:"Oui, je suis prêt."},
-{word:"Non", meaning:"No", sentence:"Non, je ne veux pas."},
-{word:"Bonsoir", meaning:"Good evening", sentence:"Bonsoir tout le monde."},
-{word:"Pain", meaning:"Bread", sentence:"Je mange du pain."},
-{word:"Eau", meaning:"Water", sentence:"Je bois de l'eau."},
-{word:"Chat", meaning:"Cat", sentence:"Le chat dort."},
-{word:"Chien", meaning:"Dog", sentence:"Le chien court."},
-{word:"Maison", meaning:"House", sentence:"La maison est grande."},
-
-{word:"École", meaning:"School", sentence:"Je vais à l'école."},
-{word:"Livre", meaning:"Book", sentence:"Je lis un livre."},
-{word:"Voiture", meaning:"Car", sentence:"La voiture est rapide."},
-{word:"Rouge", meaning:"Red", sentence:"La pomme est rouge."},
-{word:"Bleu", meaning:"Blue", sentence:"Le ciel est bleu."},
-{word:"Vert", meaning:"Green", sentence:"L'herbe est verte."},
-{word:"Manger", meaning:"To eat", sentence:"Je vais manger."},
-{word:"Boire", meaning:"To drink", sentence:"Je veux boire."},
-{word:"Aller", meaning:"To go", sentence:"Je vais à la maison."},
-{word:"Venir", meaning:"To come", sentence:"Il va venir."},
-
-// continue up to 100 (no repeats)
-{word:"Père", meaning:"Father", sentence:"Mon père travaille."},
-{word:"Mère", meaning:"Mother", sentence:"Ma mère cuisine."},
-{word:"Ami", meaning:"Friend", sentence:"Il est mon ami."},
-{word:"Jour", meaning:"Day", sentence:"Aujourd'hui est un bon jour."},
-{word:"Nuit", meaning:"Night", sentence:"La nuit est calme."},
-{word:"Temps", meaning:"Time", sentence:"Le temps passe vite."},
-{word:"Main", meaning:"Hand", sentence:"Lève la main."},
-{word:"Tête", meaning:"Head", sentence:"Ma tête fait mal."},
-{word:"Yeux", meaning:"Eyes", sentence:"Tes yeux sont beaux."},
-{word:"Bouche", meaning:"Mouth", sentence:"Ferme la bouche."},
-
-{word:"Parler", meaning:"To speak", sentence:"Je parle français."},
-{word:"Voir", meaning:"To see", sentence:"Je peux voir."},
-{word:"Donner", meaning:"To give", sentence:"Je donne un cadeau."},
-{word:"Prendre", meaning:"To take", sentence:"Je prends le bus."},
-{word:"Aimer", meaning:"To like", sentence:"J'aime le chocolat."},
-{word:"Marcher", meaning:"To walk", sentence:"Je marche vite."},
-{word:"Courir", meaning:"To run", sentence:"Je cours au parc."},
-{word:"Regarder", meaning:"To watch", sentence:"Je regarde la télé."},
-{word:"Écouter", meaning:"To listen", sentence:"J'écoute la musique."},
-{word:"Travailler", meaning:"To work", sentence:"Je travaille ici."},
-
-// add more until 100 (you can expand later easily)
+"Bonjour","Merci","Chat","Chien","Maison","École","Livre","Voiture","Pain","Eau",
+"Rouge","Bleu","Vert","Jaune","Noir","Blanc","Manger","Boire","Aller","Venir",
+"Père","Mère","Ami","Jour","Nuit","Temps","Main","Tête","Yeux","Bouche",
+"Parler","Voir","Donner","Prendre","Aimer","Marcher","Courir","Regarder","Écouter","Travailler",
+"Ville","Route","Parc","Mer","Montagne","Forêt","Soleil","Pluie","Vent","Neige",
+"Chaise","Table","Porte","Fenêtre","Stylo","Cahier","Sac","Chaussure","Chapeau","Montre",
+"Ordinateur","Téléphone","Clavier","Souris","Écran","Application","Internet","Mot","Phrase","Question",
+"Réponse","Langue","Apprendre","Étudier","Comprendre","Parfait","Facile","Difficile","Rapide","Lent",
+"Heure","Minute","Seconde","Matin","Soir","Midi","Hier","Demain","Aujourd'hui","Toujours"
 ];
 
-// =========================
-// SINGLE LESSON FLOW
-// =========================
-let currentLesson = 0;
+// ================= LESSON FLOW =================
+function loadLesson(){
+  if(!user) return;
 
-function showLesson(){
-  let lesson = lessons[currentLesson];
+  let word = lessons[lessonIndex];
 
-  document.getElementById("lessonsContainer").innerHTML = `
-    <h3>${lesson.word}</h3>
-    <p><b>Meaning:</b> ${lesson.meaning}</p>
-    <button onclick="speakWord()">🔊 Hear Word</button>
-    <br><br>
-    <button onclick="showSentence()">Continue ➡️</button>
+  document.getElementById("lessonBox").innerHTML = `
+    <h2>${word}</h2>
+    <button onclick="speak('${word}')">🔊</button>
+    <button onclick="showSentence()">Continue</button>
   `;
 }
 
 function showSentence(){
-  let lesson = lessons[currentLesson];
+  let word = lessons[lessonIndex];
 
-  document.getElementById("lessonsContainer").innerHTML = `
-    <h3>${lesson.word}</h3>
-    <p><b>Sentence:</b> ${lesson.sentence}</p>
-    <button onclick="speakSentence()">🔊 Hear Sentence</button>
-    <br><br>
-    <button onclick="nextLesson()">Next Lesson ➡️</button>
+  document.getElementById("lessonBox").innerHTML = `
+    <p>Je vois ${word}</p>
+    <button onclick="quiz()">Quiz</button>
   `;
 }
 
+function quiz(){
+  let word = lessons[lessonIndex];
+
+  document.getElementById("lessonBox").innerHTML = `
+    <p>${word} means?</p>
+    <button onclick="correct()">Correct</button>
+    <button onclick="wrong()">Wrong</button>
+  `;
+}
+
+function correct(){
+  xp += 10;
+  coins += 5;
+  nextLesson();
+}
+
+function wrong(){
+  nextLesson();
+}
+
 function nextLesson(){
-  currentLesson++;
-  addXP(5);
+  lessonIndex++;
+  save();
 
-  if(currentLesson >= lessons.length){
-    document.getElementById("lessonsContainer").innerHTML = "<h3>🎉 All Lessons Completed!</h3>";
+  if(lessonIndex >= lessons.length){
+    document.getElementById("lessonBox").innerHTML = "🎉 Done!";
     return;
   }
 
-  showLesson();
+  updateUI();
+  loadLesson();
 }
 
-// =========================
-// TEXT TO SPEECH
-// =========================
-function speakWord(){
-  let lesson = lessons[currentLesson];
-  let speech = new SpeechSynthesisUtterance(lesson.word);
-  speech.lang = "fr-FR";
-  speechSynthesis.speak(speech);
+// ================= SAVE =================
+function save(){
+  localStorage.setItem("lesson", lessonIndex);
+  localStorage.setItem("xp", xp);
+  localStorage.setItem("level", level);
+  localStorage.setItem("coins", coins);
+  localStorage.setItem("money", money);
 }
 
-function speakSentence(){
-  let lesson = lessons[currentLesson];
-  let speech = new SpeechSynthesisUtterance(lesson.sentence);
-  speech.lang = "fr-FR";
-  speechSynthesis.speak(speech);
+// ================= MISSIONS =================
+function loadMissions(){
+  document.getElementById("mission1").innerText = "Finish 3 lessons (+20 coins)";
+  document.getElementById("mission2").innerText = "Earn 50 XP (+10 coins)";
+  document.getElementById("mission3").innerText = "Use voice 1 time (+5 coins)";
 }
 
-// START FIRST LESSON
-showLesson();
-
-// =========================
-// QUIZ (unchanged)
-// =========================
-let questions = [
-  {q:"Bonjour means?",a:"Hello",b:"Bye",correct:"a"},
-  {q:"Merci means?",a:"Thanks",b:"No",correct:"a"}
-];
-
-let index=0, score=0;
-
-function loadQ(){
-  if(index < questions.length){
-    document.getElementById("q").innerText = questions[index].q;
-    document.getElementById("a").innerText = questions[index].a;
-    document.getElementById("b").innerText = questions[index].b;
-  } else {
-    document.getElementById("q").innerText = "Finished!";
-  }
+// ================= SHOP =================
+function buy(item){
+  if(coins < 20) return alert("Not enough coins");
+  coins -= 20;
+  updateUI();
+  alert("Bought " + item);
 }
 
-function answer(choice){
-  if(choice === questions[index].correct){
-    score++;
-    addXP(10);
-  }
-  index++;
-  updateProgress();
-  loadQ();
+// ================= MONEY =================
+function convertCoins(){
+  if(coins < 100) return alert("Need 100 coins");
+
+  coins -= 100;
+  money += 1;
+
+  save();
+  updateUI();
+
+  alert("$1 added!");
 }
 
-function updateProgress(){
-  let progress = (index/questions.length)*100;
-  document.getElementById("progressBar").value = progress;
+// ================= SPEECH =================
+function speak(text){
+  let u = new SpeechSynthesisUtterance(text);
+  u.lang = "fr-FR";
+  speechSynthesis.speak(u);
 }
 
-loadQ();
-
-// PRACTICE
-function checkPractice(){
-  let input = document.getElementById("practiceInput").value.toLowerCase();
-  if(input === "bonjour"){
-    document.getElementById("practiceResult").innerText = "✅ Correct";
-  } else {
-    document.getElementById("practiceResult").innerText = "❌ Try again";
-  }
+// ================= VOICE =================
+function startVoice(){
+  let rec = new (webkitSpeechRecognition || SpeechRecognition)();
+  rec.onresult = e=>{
+    let t = e.results[0][0].transcript.toLowerCase();
+    if(t.includes("hello")) speak("bonjour");
+    else speak("je ne comprends pas");
+  };
+  rec.start();
 }
 
-// LISTENING
-function checkAnswer(btn){
-  let form = btn.parentElement;
-  let selected = form.querySelector("input:checked");
-  let result = form.querySelector(".result");
-
-  if(!selected){
-    result.innerText = "Choose answer!";
-    return;
-  }
-
-  if(selected.value === form.dataset.answer){
-    result.innerText = "✅ Correct";
-  } else {
-    result.innerText = "❌ Wrong";
-  }
+// AUTO LOAD
+if(user){
+  document.getElementById("welcome").innerText = "Welcome back " + user;
+  updateUI();
+  loadLesson();
+  loadMissions();
 }
